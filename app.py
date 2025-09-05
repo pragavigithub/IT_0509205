@@ -82,6 +82,7 @@ try:
 except Exception as e:
     logging.error(f"❌ Database connection failed: {e}")
     # If MySQL from JSON fails, try PostgreSQL fallback
+    from sqlalchemy import create_engine, text
     try:
         database_url = os.environ.get('DATABASE_URL')
         if database_url:

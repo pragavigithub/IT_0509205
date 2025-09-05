@@ -14,7 +14,10 @@ def load_credentials_from_json(file_path=None):
         dict: Dictionary containing credentials
     """
     if file_path is None:
-        file_path = "C:/tmp/sap_login/credential.json"
+        # Try Linux path first (for Replit), then Windows path
+        file_path = "/tmp/sap_login/credential.json"
+        if not os.path.exists(file_path):
+            file_path = "C:/tmp/sap_login/credential.json"
     
     try:
         if os.path.exists(file_path):
