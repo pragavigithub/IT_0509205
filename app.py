@@ -25,22 +25,16 @@ app.secret_key = os.environ.get("SESSION_SECRET") or "dev-secret-key-change-in-p
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
 # -------------------------------
-# MySQL Database Configuration
+# PostgreSQL Database Configuration
 # -------------------------------
-mysql_config = {
-    'host': os.environ.get('MYSQL_HOST', 'localhost'),
-    'port': os.environ.get('MYSQL_PORT', '3306'),
-    'user': os.environ.get('MYSQL_USER', 'root'),
-    'password': os.environ.get('MYSQL_PASSWORD', 'root123'),
-    'database': os.environ.get('MYSQL_DATABASE', 'it_lobby')
-}
 
 try:
-    database_url = (
-        f"mysql+pymysql://{mysql_config['user']}:{mysql_config['password']}"
-        f"@{mysql_config['host']}:{mysql_config['port']}/{mysql_config['database']}"
-    )
-    logging.info(f"Using MySQL database: {database_url}")
+    # Use Replit's PostgreSQL database
+    database_url = os.environ.get('DATABASE_URL')
+    if not database_url:
+        raise Exception("DATABASE_URL environment variable not found")
+    
+    logging.info(f"Using PostgreSQL database: {database_url.split('@')[0]}@...")
 
     from sqlalchemy import create_engine, text
     test_engine = create_engine(database_url, connect_args={'connect_timeout': 5})
@@ -54,12 +48,12 @@ try:
         "pool_size": 10,
         "max_overflow": 20
     }
-    db_type = "mysql"
-    logging.info("✅ MySQL database connection successful")
+    db_type = "postgresql"
+    logging.info("✅ PostgreSQL database connection successful")
 
 except Exception as e:
-    logging.error(f"❌ MySQL connection failed: {e}")
-    raise SystemExit("Database connection failed. Please check MySQL settings.")
+    logging.error(f"❌ PostgreSQL connection failed: {e}")
+    raise SystemExit("Database connection failed. Please check PostgreSQL settings.")
 
 # Store database type
 app.config["DB_TYPE"] = db_type
@@ -86,19 +80,19 @@ with app.app_context():
     db.create_all()
     logging.info("✅ Database tables created")
 
-    # Drop unique constraint if exists
+    # Drop unique constraint if exists (PostgreSQL version)
     try:
         from sqlalchemy import text
         with db.engine.connect() as conn:
             result = conn.execute(text("""
-                SELECT CONSTRAINT_NAME 
-                FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS 
-                WHERE TABLE_SCHEMA = DATABASE() 
-                AND TABLE_NAME = 'serial_number_transfer_serials' 
-                AND CONSTRAINT_NAME = 'unique_serial_per_item'
+                SELECT constraint_name 
+                FROM information_schema.table_constraints 
+                WHERE table_schema = 'public' 
+                AND table_name = 'serial_number_transfer_serials' 
+                AND constraint_name = 'unique_serial_per_item'
             """))
             if result.fetchone():
-                conn.execute(text("ALTER TABLE serial_number_transfer_serials DROP INDEX unique_serial_per_item"))
+                conn.execute(text("ALTER TABLE serial_number_transfer_serials DROP CONSTRAINT unique_serial_per_item"))
                 conn.commit()
                 logging.info("Dropped unique_serial_per_item constraint")
     except Exception as e:

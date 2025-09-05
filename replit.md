@@ -27,12 +27,14 @@ This is a Flask-based Warehouse Management System with SAP B1 integration. The a
 - GRPO (Goods Receipt PO) functionality
 
 ## Setup Status
-✅ PostgreSQL database configured and connected
+✅ PostgreSQL database configured and connected (migrated from MySQL)
 ✅ Default admin user created (username: admin, password: admin123)
 ✅ Environment variables configured (DATABASE_URL, SESSION_SECRET)
-✅ Gunicorn server running on port 5000
+✅ Gunicorn server running on port 5000 with webview output
 ✅ Deployment configuration set for autoscale
 ✅ All database tables created with default data
+✅ Flask application configured for Replit environment with ProxyFix
+✅ Application successfully running in Replit environment
 
 ## Default Credentials
 - **Username**: admin
@@ -48,7 +50,10 @@ This is a Flask-based Warehouse Management System with SAP B1 integration. The a
 - Barcode generation utilities
 
 ## Recent Changes
-- Configured for Replit environment (September 3, 2025)
-- PostgreSQL database setup completed
-- Default branch and admin user initialized
-- Logging system configured for development
+- Migrated from MySQL to PostgreSQL for Replit environment (September 5, 2025)
+- Database configuration updated to use Replit's managed PostgreSQL
+- Workflow configured with webview output on port 5000
+- ProxyFix middleware properly configured for Replit iframe environment
+- Deployment configuration set for autoscale production deployment
+- PostgreSQL-specific constraint handling implemented
+- Default branch and admin user initialized successfully
