@@ -26,6 +26,32 @@ This is a Flask-based Warehouse Management System with SAP B1 integration. The a
 - Pick list management
 - GRPO (Goods Receipt PO) functionality
 
+## Credential Configuration
+The application now supports reading credentials from a JSON file for better security and configuration management:
+
+### JSON Credential File Format
+Location: `/tmp/sap_login/credential.json` (Linux) or `C:/tmp/sap_login/credential.json` (Windows)
+
+```json
+{
+   "SAP_B1_SERVER": "https://192.168.0.134:50000",
+   "SAP_B1_USERNAME": "manager",
+   "SAP_B1_PASSWORD": "1422",
+   "SAP_B1_COMPANY_DB": "EINV-TESTDB-LIVE-HUST",
+   "MYSQL_HOST": "localhost",
+   "MYSQL_PORT": "3306",
+   "MYSQL_USER": "root",
+   "MYSQL_PASSWORD": "root123",
+   "MYSQL_DATABASE": "it_lobby",
+   "DATABASE_URL": "mysql+pymysql://root:root123@localhost:3306/it_lobby"
+}
+```
+
+### Fallback Behavior
+- If JSON file is not found, application falls back to environment variables
+- If MySQL connection fails, application automatically falls back to PostgreSQL (Replit environment)
+- All credentials support both JSON and environment variable configuration
+
 ## Setup Status
 ✅ PostgreSQL database configured and connected (migrated from MySQL)
 ✅ Default admin user created (username: admin, password: admin123)
@@ -50,6 +76,11 @@ This is a Flask-based Warehouse Management System with SAP B1 integration. The a
 - Barcode generation utilities
 
 ## Recent Changes
+- **JSON Credential Loading System** (September 5, 2025)
+  - Added support for reading SAP B1 and MySQL credentials from JSON file
+  - Default credential path: `/tmp/sap_login/credential.json` (Linux) or `C:/tmp/sap_login/credential.json` (Windows)
+  - Automatic fallback to environment variables if JSON file not found
+  - MySQL connection with PostgreSQL fallback for Replit environment
 - Migrated from MySQL to PostgreSQL for Replit environment (September 5, 2025)
 - Database configuration updated to use Replit's managed PostgreSQL
 - Workflow configured with webview output on port 5000
