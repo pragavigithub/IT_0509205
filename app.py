@@ -8,10 +8,20 @@ from sqlalchemy.orm import DeclarativeBase
 from werkzeug.middleware.proxy_fix import ProxyFix
 from credential_loader import load_credentials_from_json, get_credential
 
+# Load .env file if it exists
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+    logging.info("✅ .env file loaded successfully")
+except ImportError:
+    logging.warning("⚠️ python-dotenv not installed. Install with: pip install python-dotenv")
+except Exception as e:
+    logging.warning(f"⚠️ Could not load .env file: {e}")
+
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 
-# Load credentials from JSON file
+# Load credentials from JSON file (this will also create .env file)
 credentials = load_credentials_from_json()
 
 class Base(DeclarativeBase):
@@ -85,7 +95,7 @@ except Exception as e:
     from sqlalchemy import create_engine, text
     try:
         database_url = os.environ.get('DATABASE_URL')
-        if database_url:
+        if database_url and 'postgresql' in database_url:
             logging.info("Trying PostgreSQL fallback...")
             test_engine = create_engine(database_url, connect_args={'connect_timeout': 5})
             with test_engine.connect() as conn:
